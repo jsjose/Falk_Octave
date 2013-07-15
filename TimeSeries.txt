@@ -1,0 +1,1 @@
+addpath("/Users/chemasanjose/Documents/Carpeta Mágica/BibliotecaN/1.- Lecturas pendientes/3.- Time Series/Falk octave")
