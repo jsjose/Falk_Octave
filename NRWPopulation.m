@@ -1,52 +1,48 @@
-%#! /Applications/Octave.app/Contents/MacOS/Octave Ðqf
+%#! /opt/local/bin/octave -qf
+clear all; clf;
+pkg load all;
+disp("NRWPopulation v1 23/12/15");
+disp("First course on Time Series Analysis, Falk, page 10");
+disp("Dependencies: optim-1.4.1.tar.gz, struct-1.0.11.tar.gz");
+global verbose; verbose = false;
+
+%---------------------------------------------%
+function [y] = logistic(x,par)
+  y = par(3)./(1+par(2)*exp(-par(1)*x));
+end;
+%logistic = @ (x,par) par(3)./(1+par(2)*exp(-par(1)*x));
+%---------------------------------------------%
+
 %%---------------------------------------------%
 %-------- NRW Population-----------------------%
 %----------------------------------------------%
-
-clear;
-
-% Lectura de Datos:
-
-load 'NRWPopulation.dat'
-
-% calculo de parametros
-
-beta_i(1) = 0
-beta_i(2) = 0
-beta_i(3) = 10
-
-%beta = nlinfit(Time,pop,@logistic,beta_i);
-
-%[beta,r,J] = nlinfit(reactants,rate,'logistic',beta0);
-
-beta(1) = 0.1675
-beta(2) = 1.1436
-beta(3) = 21.5016
-
-% aproximaci—n
+% Data:
+load 'NRWPopulation_dat.dat';
 
 for i = 1:10
-  Popest1(i) = logistic(beta, i);
+  x(i) = NRWPopulation_dat(i,2);
+	y(i) = NRWPopulation_dat(i,3); 
 end
 
-beta(1) = 0.1675
-beta(2) = 1.1436
-beta(3) = 21.5016
+% initial value
+pin = [0.15; 1.14; 21.5];
 
-% aproximacion
-for i = 1:100
-    Time(i) = i;
-    Popest2(i) = logistic(beta, i);
+[Popest2,betas,cvg,iter,corp,covp] = leasqr(x,y,pin,"logistic");
+
+% estimate
+for i = 1:10
+  Popest1(i) = logistic(i, betas);
 end
 
-% representación de datos:
-
+% graph:
 hold on
+plot(x, Popest1,'-.r+');
+plot(x, y,'.g*');
+plot(x, Popest2,'.b*');
+title('Population size at NRW');
+xlabel('t (month)');
+ylabel('population in millions');
 
-%plot(Time, pop,'-.r+');
-plot(Time, Popest2,'-.g*');
-hold off
-title('Poblacion en NRW')
-xlabel('t (meses)')
-ylabel('poblacion en millones')
-%axis([0 longmax 0 1])
+%---------------------------------------------%
+%---------------------------------------------%
+%---------------------------------------------%
